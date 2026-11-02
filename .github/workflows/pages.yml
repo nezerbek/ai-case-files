@@ -1,0 +1,43 @@
+name: Publish book
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Import source on first run
+        run: |
+          if [ -f AI_Case_Files_GitHub_Source.zip ]; then
+            unzip -q AI_Case_Files_GitHub_Source.zip -d /tmp/book-import
+            cp -a /tmp/book-import/Acp -a /tmp/book-import/AI_Case_Files_GitHub_Source/{src,public,tests,package.json,package-lock.json,index.html,vite.config.js,README.md,.gitignore} .iles_GitHub_Source.zip
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add .
+            git commit -m 'Import AI Case Files source'
+            git push
+          fi
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
