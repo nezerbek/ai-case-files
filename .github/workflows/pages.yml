@@ -26,6 +26,7 @@ jobs:
         working-directory: AI_Case_Files_GitHub_Source
       - run: npm run build
         working-directory: AI_Case_Files_GitHub_Source
+      - run: cp -R ai-field-atlas AI_Case_Files_GitHub_Source/dist/ai-field-atlas
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
